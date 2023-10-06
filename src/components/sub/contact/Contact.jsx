@@ -92,14 +92,21 @@ export default function Contact() {
 	const sendEmail = (e) => {
 		e.preventDefault();
 
-		emailjs.sendForm('service_dmk9tw4', 'template_sxu0lzf', form.current, 'l_Nau7M83mH_rD9FR').then(
-			(result) => {
-				alert('문의내용이 메일로 발송되었습니다.');
-			},
-			(error) => {
-				alert('문의내용 전송에 실패했습니다.');
-			}
-		);
+		emailjs
+			.sendForm(
+				`${process.env.REACT_APP_SERVICE_ID}`,
+				`${process.env.REACT_APP_TEMPLATE_ID}`,
+				form.current,
+				`${process.env.REACT_APP_PUBLIC_KEY}`
+			)
+			.then(
+				(result) => {
+					alert('문의내용이 메일로 발송되었습니다.');
+				},
+				(error) => {
+					alert('문의내용 전송에 실패했습니다.');
+				}
+			);
 	};
 
 	return (
