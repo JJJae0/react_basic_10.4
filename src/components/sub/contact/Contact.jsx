@@ -76,7 +76,7 @@ export default function Contact() {
 			<div className='map' ref={map}></div>
 			<ul>
 				{info.current.map((el, idx) => (
-					<li key={idx} onClick={() => setIndex(idx)}>
+					<li className={Index === idx ? 'on' : ''} key={idx} onClick={() => setIndex(idx)}>
 						{el.title}
 					</li>
 				))}
