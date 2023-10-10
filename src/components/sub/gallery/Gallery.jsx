@@ -14,8 +14,7 @@ export default function Gallery() {
 		const method_interest = 'flickr.interestingness.getList';
 		const method_user = 'flickr.people.getPhotos';
 		const method_search = 'flickr.photos.search';
-
-		const num = 50;
+		const num = 500;
 
 		//fetching함수 호출시 타입값이 있는 객체를 인수로 전달하면 해당 타입에 따라 호출 URL이 변경되고
 		//해당URL을 통해 받아지는 데이터로 달라짐
@@ -31,6 +30,11 @@ export default function Gallery() {
 
 		const data = await fetch(url);
 		const json = await data.json();
+
+		if (json.photos.photo.length === 0) {
+			return alert('해당 검색어의 결과값이 없습니다.');
+		}
+
 		console.log(json.photos.photo);
 		setPics(json.photos.photo);
 	};
@@ -91,6 +95,14 @@ export default function Gallery() {
 										<img
 											src={`http://farm${data.farm}.staticflickr.com/${data.server}/buddyicons/${data.owner}.jpg`}
 											alt={data.owner}
+											onError={(e) => {
+												//만약 사용자가 프로필 이미지를 올리지 않았을때 엑박이 뜨므로
+												//onError이벤트를 연결해서 대체이미지 출력
+												e.target.setAttribute(
+													'src',
+													'https://www.flickr.com/images/buddyicon.gif'
+												);
+											}}
 										/>
 										<span
 											onClick={() =>
