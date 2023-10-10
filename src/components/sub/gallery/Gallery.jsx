@@ -40,6 +40,12 @@ export default function Gallery() {
 
 	return (
 		<Layout title={'Gallery'}>
+			<button onClick={() => fetchData({ type: 'user', id: my_id })}>
+				My Gallery
+			</button>
+			<button onClick={() => fetchData({ type: 'interest' })}>
+				Interest Gallery
+			</button>
 			<div className='picFrame'>
 				<Masonry
 					elementType={'div'}
@@ -63,7 +69,13 @@ export default function Gallery() {
 											src={`http://farm${data.farm}.staticflickr.com/${data.server}/buddyicons/${data.owner}.jpg`}
 											alt={data.owner}
 										/>
-										<span>{data.owner}</span>
+										<span
+											onClick={() =>
+												fetchData({ type: 'user', id: data.owner })
+											}
+										>
+											{data.owner}
+										</span>
 									</div>
 								</div>
 							</article>
