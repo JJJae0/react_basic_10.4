@@ -6,14 +6,12 @@ import Masonry from 'react-masonry-component';
 export default function Gallery() {
 	const refFrame = useRef(null);
 	const refInput = useRef(null);
+	const refBtnSet = useRef(null);
 	const [Pics, setPics] = useState([]);
 	const [Loader, setLoader] = useState(true);
 	const my_id = '199347294@N08';
 
 	const fetchData = async (opt) => {
-		//이벤트 버튼 (interest gallery, my gallery 버튼 클릭할때마다)
-		//새롭게 데이터 fetching을 해야되므로 다시 로딩바 보이게 하고
-		//기존 frame은 안보이도록 on 클래스 제거
 		setLoader(true);
 		refFrame.current.classList.remove('on');
 		let url = '';
@@ -84,11 +82,38 @@ export default function Gallery() {
 				</form>
 			</div>
 
-			<div className='btnSet'>
-				<button onClick={() => fetchData({ type: 'user', id: my_id })}>
+			<div className='btnSet' ref={refBtnSet}>
+				<button
+					className='on'
+					onClick={(e) => {
+						//각 버튼 클릭시 해당 버튼에 만약 on클래스가 있으면 이미 활성화 되어 있는 버튼이므로 return으로 종료해서
+						//fetchData함수 호출 방지
+						if (e.target.classList.contains('on')) return;
+
+						//클릭한 버튼요소에 on이없으면 해당 버튼활성화
+						const btns = refBtnSet.current.querySelectorAll('button');
+						btns.forEach((btn) => btn.classList.remove('on'));
+						e.target.classList.add('on');
+
+						fetchData({ type: 'user', id: my_id });
+					}}
+				>
 					My Gallery
 				</button>
-				<button onClick={() => fetchData({ type: 'interest' })}>
+				<button
+					onClick={(e) => {
+						//각 버튼 클릭시 해당 버튼에 만약 on클래스가 있으면 이미 활성화 되어 있는 버튼이므로 return으로 종료해서
+						//fetchData함수 호출 방지
+						if (e.target.classList.contains('on')) return;
+
+						//클릭한 버튼요소에 on이없으면 해당 버튼활성화
+						const btns = refBtnSet.current.querySelectorAll('button');
+						btns.forEach((btn) => btn.classList.remove('on'));
+						e.target.classList.add('on');
+
+						fetchData({ type: 'interest' });
+					}}
+				>
 					Interest Gallery
 				</button>
 			</div>
