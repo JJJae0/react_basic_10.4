@@ -7,16 +7,21 @@ export default function Gallery() {
 	const refFrame = useRef(null);
 	const refInput = useRef(null);
 	const [Pics, setPics] = useState([]);
-	const [Loader, setLoader] = useState(false);
+	const [Loader, setLoader] = useState(true);
 	const my_id = '199347294@N08';
 
 	const fetchData = async (opt) => {
+		//이벤트 버튼 (interest gallery, my gallery 버튼 클릭할때마다)
+		//새롭게 데이터 fetching을 해야되므로 다시 로딩바 보이게 하고
+		//기존 frame은 안보이도록 on 클래스 제거
+		setLoader(true);
+		refFrame.current.classList.remove('on');
 		let url = '';
 		const api_key = '96ddb1e402c9b1e2d2088753c5a225ca';
 		const method_interest = 'flickr.interestingness.getList';
 		const method_user = 'flickr.people.getPhotos';
 		const method_search = 'flickr.photos.search';
-		const num = 500;
+		const num = 100;
 
 		//fetching함수 호출시 타입값이 있는 객체를 인수로 전달하면 해당 타입에 따라 호출 URL이 변경되고
 		//해당URL을 통해 받아지는 데이터로 달라짐
@@ -48,6 +53,9 @@ export default function Gallery() {
 				console.log('현재 로딩된 img갯수', count);
 				if (count === imgs.length) {
 					console.log('모든 이미지 소스 렌더링 완료!');
+					//모든 소스이미지라 렌더링완료되면 Loader값을 false로 바꿔서 로딩이미지 제거
+					setLoader(false);
+					refFrame.current.classList.add('on');
 				}
 			};
 		});
@@ -85,60 +93,59 @@ export default function Gallery() {
 				</button>
 			</div>
 
-			{/* Loader가 true: 로딩바출력, Loader가 false: 갤러리 프레임 출력 */}
-			{Loader ? (
+			{/* Loader가 true일때에만 로딩 이미지 출력 */}
+			{Loader && (
 				<img
 					className='loading'
 					src={`${process.env.PUBLIC_URL}/img/loading.gif`}
 					alt='loading'
 				/>
-			) : (
-				<div className='picFrame' ref={refFrame}>
-					<Masonry
-						elementType={'div'}
-						options={{ transitionDuration: '0.5s' }}
-						disableImagesLoaded={false}
-						updateOnEachImageLoad={false}
-					>
-						{Pics.map((data, idx) => {
-							return (
-								<article key={idx}>
-									<div className='inner'>
-										<img
-											className='pic'
-											src={`https://live.staticflickr.com/${data.server}/${data.id}_${data.secret}_m.jpg`}
-											alt={`https://live.staticflickr.com/${data.server}/${data.id}_${data.secret}_b.jpg`}
-										/>
-										<h2>{data.title}</h2>
-
-										<div className='profile'>
-											<img
-												src={`http://farm${data.farm}.staticflickr.com/${data.server}/buddyicons/${data.owner}.jpg`}
-												alt={data.owner}
-												onError={(e) => {
-													//만약 사용자가 프로필 이미지를 올리지 않았을때 엑박이 뜨므로
-													//onError이벤트를 연결해서 대체이미지 출력
-													e.target.setAttribute(
-														'src',
-														'https://www.flickr.com/images/buddyicon.gif'
-													);
-												}}
-											/>
-											<span
-												onClick={() =>
-													fetchData({ type: 'user', id: data.owner })
-												}
-											>
-												{data.owner}
-											</span>
-										</div>
-									</div>
-								</article>
-							);
-						})}
-					</Masonry>
-				</div>
 			)}
+			<div className='picFrame' ref={refFrame}>
+				<Masonry
+					elementType={'div'}
+					options={{ transitionDuration: '0.5s' }}
+					disableImagesLoaded={false}
+					updateOnEachImageLoad={false}
+				>
+					{Pics.map((data, idx) => {
+						return (
+							<article key={idx}>
+								<div className='inner'>
+									<img
+										className='pic'
+										src={`https://live.staticflickr.com/${data.server}/${data.id}_${data.secret}_m.jpg`}
+										alt={`https://live.staticflickr.com/${data.server}/${data.id}_${data.secret}_b.jpg`}
+									/>
+									<h2>{data.title}</h2>
+
+									<div className='profile'>
+										<img
+											src={`http://farm${data.farm}.staticflickr.com/${data.server}/buddyicons/${data.owner}.jpg`}
+											alt={data.owner}
+											onError={(e) => {
+												//만약 사용자가 프로필 이미지를 올리지 않았을때 엑박이 뜨므로
+												//onError이벤트를 연결해서 대체이미지 출력
+												e.target.setAttribute(
+													'src',
+													'https://www.flickr.com/images/buddyicon.gif'
+												);
+											}}
+										/>
+										<span
+											onClick={() =>
+												fetchData({ type: 'user', id: data.owner })
+											}
+										>
+											{data.owner}
+										</span>
+									</div>
+								</div>
+							</article>
+						);
+					})}
+				</Masonry>
+			</div>
 		</Layout>
 	);
 }
