@@ -1,19 +1,18 @@
 import Layout from '../../common/layout/Layout';
 import './Contact.scss';
-import emailjs from '@emailjs/browser';
 import { useRef, useEffect, useState } from 'react';
+import emailjs from '@emailjs/browser';
 
 export default function Contact() {
-	const form = useRef(null);
+	const form = useRef();
 	const map = useRef(null);
-	const view = useRef(null);
 	const instance = useRef(null);
+	const view = useRef(null);
 	const [Traffic, setTraffic] = useState(false);
 	const [Index, setIndex] = useState(0);
+	const { kakao } = window;
 	const [IsMap, setIsMap] = useState(true);
 
-	const { kakao } = window;
-	//첫번째 지도를 출력하기 위한 객체정보
 	const info = useRef([
 		{
 			title: '삼성역 코엑스',
@@ -38,7 +37,6 @@ export default function Contact() {
 		},
 	]);
 
-	//위의 정보값을 활용한 마커 객체 생성
 	const marker = new kakao.maps.Marker({
 		position: info.current[Index].latlng,
 		image: new kakao.maps.MarkerImage(
@@ -57,59 +55,58 @@ export default function Contact() {
 		//Index값이 변경될때마다 새로운 지도 레이어가 중첩되므로
 		//일단은 기존 map안의 모든 요소를 없애서 초기화
 		map.current.innerHTML = '';
-		//객체 정보를 활용한 지도 객체 생성
+		//컴포넌트 마운트 되자마자 지도인스턴스 생성
 		instance.current = new kakao.maps.Map(map.current, {
 			center: info.current[Index].latlng,
 			level: 1,
 		});
-		//마커 객체에 지도 객체 연결
 		marker.setMap(instance.current);
-
-		//지도 타입 변경 UI추가
 		const mapTypeControl = new kakao.maps.MapTypeControl();
-		instance.current.addControl(mapTypeControl, kakao.maps.ControlPosition.BOTTOMLEFT);
+		instance.current.addControl(
+			mapTypeControl,
+			kakao.maps.ControlPosition.BOTTOMLEFT
+		);
 		window.addEventListener('resize', setCenter);
+		//로드뷰관련코드
 
-		//로드뷰 관련 코드
 		new kakao.maps.RoadviewClient().getNearestPanoId(
 			info.current[Index].latlng,
-			100, //해당 지도의 위치값에서 반경 100미터 안에 제일 가까운 도로 기준으로 로드뷰화면 생성
+			50, //해당 지도의 위치값에서 반경 100미터 안에 제일 가까운 도로 기준으로 로드뷰화면 생성
 			(panoId) => {
-				new kakao.maps.Roadview(view.current).setPanoId(panoId, info.current[Index].latlng);
+				new kakao.maps.Roadview(view.current).setPanoId(
+					panoId,
+					info.current[Index].latlng
+				); //panoId와 중심좌표를 통해 로드뷰 실행
 			}
 		);
-	}, [Index]); //Index값이 변경될때마다 지도화면이 다시 갱신되어야 하므로 Index값을 의존성 배열에 등록
+	}, []);
 
 	useEffect(() => {
-		//traffic 값이 바뀔때마다 실행될 구문
 		Traffic
 			? instance.current.addOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC)
 			: instance.current.removeOverlayMapTypeId(kakao.maps.MapTypeId.TRAFFIC);
-	}, [Traffic]);
+	}, []);
 
-	const resetForm = () => {
-		const nameForm = form.current.querySelector('.nameEl');
-		const mailForm = form.current.querySelector('.emailEl');
-		const msgForm = form.current.querySelector('.msgEl');
-		nameForm.value = '';
-		mailForm.value = '';
-		msgForm.value = '';
+	const resetFrom = () => {
+		const nameform = form.current.querySelector('.nameEl');
+		const emailform = form.current.querySelector('.emailEl');
+		const msgform = form.current.querySelector('.msgEl');
+		nameform.value = '';
+		emailform.value = '';
+		msgform.value = '';
 	};
 
-	//form mail 기능함수
 	const sendEmail = (e) => {
 		e.preventDefault();
 
-		const nameForm = form.current.querySelector('.nameEl');
-		const mailForm = form.current.querySelector('.emailEl');
-		const msgForm = form.current.querySelector('.msgEl');
+		const nameform = form.current.querySelector('.nameEl');
+		const emailform = form.current.querySelector('.emailEl');
+		const msgform = form.current.querySelector('.msgEl');
 
-		if (!nameForm.value || !mailForm.value || !msgForm.value)
-			return alert('사용자이름, 이메일주소, 문의내용은 필수 입력사항입니다.');
-
-		//sendForm메서드는 각 키값을 문자열로만 인수로 전달되도록 type지정되어 있기 때문에
+		if (!nameform.value || !emailform.value || !msgform.value)
+			return alert('사용자이름,이메일주소,문의내용은 필수 입력사항입니다.');
+		//sendFrom메서드는 각 키값을 문자열로만 인수로 전달되도록 type지정되어 있기 떄문에
 		//변수를 `${}`로 감싸서 문자형식으로 전달
-
 		emailjs
 			.sendForm(
 				`${process.env.REACT_APP_SERVICE_ID}`,
@@ -121,12 +118,12 @@ export default function Contact() {
 				(result) => {
 					alert('문의내용이 메일로 발송되었습니다.');
 					console.log(result);
-					resetForm();
+					resetFrom();
 				},
 				(error) => {
 					alert('문의내용 전송에 실패했습니다.');
 					console.log(error);
-					resetForm();
+					resetFrom();
 				}
 			);
 	};
@@ -141,33 +138,34 @@ export default function Contact() {
 						<label>Email</label>
 						<input type='email' name='user_email' className='emailEl' />
 					</div>
-
 					<div className='lower'>
 						<label>Message</label>
-						<br />
 						<textarea name='message' className='msgEl' />
 					</div>
-
 					<div className='btnSet'>
 						<input type='reset' value='Cancel' />
 						<input type='submit' value='Send' />
 					</div>
 				</form>
 			</div>
-
-			<div id='mapBox'>
+			<div className='mapbox'>
+				{/* <button onClick={() => setTraffic(true)}>주변 교통정보 보기</button>
+			<button onClick={() => setTraffic(false)}>주변 교통정보 끄기</button> */}
 				<button onClick={() => setTraffic(!Traffic)}>
 					{Traffic ? '교통정보 끄기' : '교통정보 켜기'}
 				</button>
-
-				<button onClick={setCenter}>지도 위치 초기화</button>
-				<button onClick={() => setIsMap(!IsMap)}>{IsMap ? '로드뷰보기' : '지도보기'}</button>
-
+				<button onClick={setCenter}>지도위치초기화</button>
+				<button
+					onClick={() => {
+						setIsMap(!IsMap);
+					}}
+				>
+					{IsMap ? '지도보기' : '로드뷰보기'}
+				</button>
 				<div className='container'>
-					<div className={`view ${IsMap ? '' : 'on'}`} ref={view}></div>
-					<div className={`map ${IsMap ? 'on' : ''}`} ref={map}></div>
+					<div className={`view  ${IsMap ? '' : 'on'}`} ref={view}></div>
+					<div className={`map  ${IsMap ? 'on' : ''}`} ref={map}></div>
 				</div>
-
 				<ul>
 					{info.current.map((el, idx) => (
 						<li
