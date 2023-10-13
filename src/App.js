@@ -7,8 +7,7 @@ import Youtube from './components/sub/youtube/Youtube';
 import Members from './components/sub/members/Members';
 import Gallery from './components/sub/gallery/Gallery';
 import Contact from './components/sub/contact/Contact';
-import Community from './components/sub/Community/Community';
-
+import Community from './components/sub/community/Community';
 function App() {
 	return (
 		<>
