@@ -8,6 +8,9 @@ import Members from './components/sub/members/Members';
 import Gallery from './components/sub/gallery/Gallery';
 import Contact from './components/sub/contact/Contact';
 import Community from './components/sub/community/Community';
+import Main from './components/main/mainWrap/Main';
+import Detail from './components/sub/youtube/Detail';
+
 function App() {
 	return (
 		<>
@@ -16,6 +19,7 @@ function App() {
 				<Route exact path='/'>
 					{/* 메인페이지 전용 헤더 */}
 					<Header isMain={true} />
+					<Main />
 				</Route>
 				<Route path='/'>
 					{/* 서브페이지 전용 헤더 */}
@@ -28,6 +32,7 @@ function App() {
 			<Route path='/members' component={Members} />
 			<Route path='/contact' component={Contact} />
 			<Route path='/community' component={Community} />
+			<Route path='/detail/:id' component={Detail} />
 		</>
 	);
 }
